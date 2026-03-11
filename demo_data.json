@@ -1,0 +1,41 @@
+[
+    {
+        "model": "ponto.servidor",
+        "pk": 1,
+        "fields": {
+            "nome_completo": "João Silva",
+            "cpf": "123.456.789-00",
+            "matricula": "S001",
+            "carga_horaria_diaria": 6,
+            "ativo": true,
+            "created_at": "2026-03-04T00:00:00Z",
+            "updated_at": "2026-03-04T00:00:00Z"
+        }
+    },
+    {
+        "model": "ponto.registroponto",
+        "pk": 1,
+        "fields": {
+            "servidor": 1,
+            "data": "2026-03-01",
+            "entrada": "08:00:00",
+            "saida": "15:00:00",
+            "minutos_trabalhados": 420,
+            "saldo_minutos_dia": 60,
+            "created_at": "2026-03-04T00:00:00Z"
+        }
+    },
+    {
+        "model": "ponto.registroponto",
+        "pk": 2,
+        "fields": {
+            "servidor": 1,
+            "data": "2026-03-02",
+            "entrada": "09:00:00",
+            "saida": "14:00:00",
+            "minutos_trabalhados": 300,
+            "saldo_minutos_dia": -60,
+            "created_at": "2026-03-04T00:00:00Z"
+        }
+    }
+]

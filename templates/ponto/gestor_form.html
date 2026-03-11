@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+
+{% block title %}Novo Gestor - Banco de Horas{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow border-0 rounded-4">
+            <div class="card-header bg-white py-3 border-0">
+                <h3 class="mb-0 fw-bold text-primary">Cadastrar Novo Gestor</h3>
+                <p class="text-muted small">Crie a identidade do gestor e sua conta de acesso simultaneamente.</p>
+            </div>
+            <div class="card-body p-4">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="fw-bold mb-3">Informações Pessoais</h5>
+                            {% bootstrap_field form.nome_completo %}
+                            {% bootstrap_field form.cpf %}
+                            {% bootstrap_field form.departamento %}
+                        </div>
+                        <div class="col-md-6 border-start">
+                            <h5 class="fw-bold mb-3">Conta de Acesso</h5>
+                            {% bootstrap_field form.username %}
+                            {% bootstrap_field form.password %}
+                            {% bootstrap_field form.password_confirm %}
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg">Criar Gestor e Conta</button>
+                        <a href="{% url 'gestor_list' %}" class="btn btn-outline-secondary">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

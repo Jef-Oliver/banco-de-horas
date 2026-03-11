@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Solicitações Pendentes - Banco de Horas{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h2 class="fw-bold text-primary">Solicitações de Folga Pendentes</h2>
+    <p class="text-muted">Analise e valide as solicitações de compensação de horas dos servidores do seu setor.</p>
+</div>
+
+<div class="card shadow-sm border-0 rounded-4">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4">Servidor</th>
+                        <th class="text-center">Data Solicitada</th>
+                        <th class="text-center">Tempo</th>
+                        <th>Descrição/Motivo</th>
+                        <th class="text-end pe-4">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in pendentes %}
+                    <tr>
+                        <td class="ps-4">
+                            <div class="fw-bold">{{ p.servidor.nome_completo }}</div>
+                            <small class="text-muted">{{ p.servidor.departamento.sigla }}</small>
+                        </td>
+                        <td class="text-center">{{ p.data|date:"d/m/Y" }}</td>
+                        <td class="text-center">
+                            <span class="badge bg-info text-dark">
+                                {{ p.minutos_descontados }} min
+                            </span>
+                        </td>
+                        <td>{{ p.descricao|default:"- - -" }}</td>
+                        <td class="text-end pe-4">
+                            <form method="post" action="{% url 'aprovar_compensacao' p.pk %}" class="d-inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="acao" value="aprovar">
+                                <button type="submit" class="btn btn-sm btn-success rounded-pill px-3 me-1">Aprovar</button>
+                            </form>
+                            <form method="post" action="{% url 'aprovar_compensacao' p.pk %}" class="d-inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="acao" value="rejeitar">
+                                <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">Rejeitar</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-5 text-muted">
+                            <i class="bi bi-check-circle h1 d-block mb-3 opacity-25"></i>
+                            Nenhuma solicitação aguardando análise no momento.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

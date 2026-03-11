@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10 text-center">
+        <div class="mb-5 animate-fade-in">
+            <h1 class="display-4 fw-bold text-primary mb-2">Banco de Horas</h1>
+            <h4 class="text-muted mb-4">Controle Interno de Jornada</h4>
+            <div class="alert alert-info d-inline-block px-4 py-2 border-0 shadow-sm rounded-pill">
+                Bem-vindo(a), <strong>{{ user.username }}</strong>! 
+                {% if user.perfil.departamento %}
+                    <span class="ms-2 badge bg-primary">Setor: {{ user.perfil.departamento.sigla }}</span>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="row g-4 justify-content-center">
+            <div class="col-md-4">
+                <div class="card h-100 p-4 shadow border-0 rounded-4 hover-lift">
+                    <div class="text-primary mb-3">
+                        <i class="bi bi-people-fill h1"></i>
+                    </div>
+                    <h3 class="display-5 fw-bold text-dark">{{ total_servidores }}</h3>
+                    <p class="text-secondary fw-medium">Servidores Sob sua Gestão</p>
+                    <a href="{% url 'servidor_list' %}" class="btn btn-outline-primary btn-sm mt-auto rounded-pill px-4">Gerenciar Servidores</a>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card h-100 p-4 shadow border-0 rounded-4 bg-primary text-white hover-lift">
+                    <div class="mb-3">
+                        <i class="bi bi-calendar-check h1"></i>
+                    </div>
+                    <h3 class="fw-bold">Lançamentos</h3>
+                    <p class="opacity-75">Registre entradas, saídas e justificativas de folga.</p>
+                    <div class="d-flex flex-column gap-2 mt-auto">
+                        <a href="{% url 'ponto_add' %}" class="btn btn-light btn-sm rounded-pill">Registrar Ponto</a>
+                        <a href="{% url 'compensacao_add' %}" class="btn btn-outline-light btn-sm rounded-pill">Registrar Folga</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card h-100 p-4 shadow border-0 rounded-4 hover-lift">
+                    <div class="text-success mb-3">
+                        <i class="bi bi-file-earmark-bar-graph h1"></i>
+                    </div>
+                    <h3 class="fw-bold text-dark">Relatórios</h3>
+                    <p class="text-secondary">Visão consolidada de saldos e banco de horas.</p>
+                    <a href="{% url 'relatorio_geral' %}" class="btn btn-outline-success btn-sm mt-auto rounded-pill px-4">Consultar Geral</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

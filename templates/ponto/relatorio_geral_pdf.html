@@ -1,0 +1,35 @@
+{% extends 'ponto/pdf_base.html' %}
+
+{% block content %}
+<div class="text-center" style="margin-bottom: 20pt;">
+    <h2 class="mb-0">Relatório Geral Acumulado</h2>
+    <div class="text-muted">Período de Referência: {{ mes_atual }}/{{ ano_atual }}</div>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>Servidor</th>
+            <th class="text-center">Carga Horária</th>
+            <th class="text-end">Saldo Acumulado</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in servidores_data %}
+        <tr>
+            <td>{{ item.servidor.nome_completo }}</td>
+            <td class="text-center">{{ item.servidor.carga_horaria_diaria }}h</td>
+            <td class="text-end">
+                <span class="{% if item.saldo_raw > 0 %}saldo-positivo{% elif item.saldo_raw < 0 %}saldo-negativo{% endif %}">
+                    {{ item.saldo_formatado }}
+                </span>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div class="mt-4 text-muted" style="font-size: 8pt; border-top: 0.5pt solid #ccc; padding-top: 5pt;">
+    * O saldo acumulado considera todas as horas extras registradas menos as folgas/compensações tiradas.
+</div>
+{% endblock %}

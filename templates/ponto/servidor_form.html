@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+
+{% block title %}{% if object %}Editar{% else %}Novo{% endif %} Servidor - Banco de Horas{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow border-0 rounded-4">
+            <div class="card-header bg-white py-3 border-0">
+                <h3 class="mb-0 fw-bold text-primary">
+                    {% if object %}Editar{% else %}Novo{% endif %} Servidor
+                </h3>
+                <p class="text-muted small">
+                    {% if not object %}
+                        Registre o servidor e crie sua conta de acesso ao sistema.
+                    {% else %}
+                        Atualize as informações do servidor.
+                    {% endif %}
+                </p>
+            </div>
+            <div class="card-body p-4">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="fw-bold mb-3">Dados Cadastrais</h5>
+                            {% bootstrap_field form.nome_completo %}
+                            {% bootstrap_field form.cpf %}
+                            {% bootstrap_field form.carga_horaria_diaria %}
+                            {% bootstrap_field form.departamento %}
+                            {% bootstrap_field form.ativo %}
+                        </div>
+                        <div class="col-md-6 border-start">
+                            <h5 class="fw-bold mb-3">Conta de Acesso</h5>
+                            {% if not object %}
+                                {% bootstrap_field form.username %}
+                                {% bootstrap_field form.password %}
+                                {% bootstrap_field form.password_confirm %}
+                            {% else %}
+                                <div class="alert alert-info py-2">
+                                    <small>A conta de usuário vinculada é: <strong>{{ object.usuario.username }}</strong></small>
+                                </div>
+                                <p class="text-muted small">Para alterar a senha do servidor, utilize o painel administrativo.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg">Salvar Servidor</button>
+                        <a href="{% url 'servidor_list' %}" class="btn btn-outline-secondary">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

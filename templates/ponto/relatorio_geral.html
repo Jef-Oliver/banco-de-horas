@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Relatório Geral de Horas</h1>
+    <div class="d-flex gap-2">
+        <form method="get" class="d-flex gap-2 align-items-center bg-light p-2 rounded">
+            <select name="mes" class="form-select form-select-sm" style="width: auto;">
+                {% for m in meses %}
+                <option value="{{ m }}" {% if m == mes_atual %}selected{% endif %}>Mês {{ m }}</option>
+                {% endfor %}
+            </select>
+            <select name="ano" class="form-select form-select-sm" style="width: auto;">
+                {% for a in anos %}
+                <option value="{{ a }}" {% if a == ano_atual %}selected{% endif %}>{{ a }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-sm btn-primary">Filtrar</button>
+            <a href="{% url 'relatorio_geral_pdf' %}?mes={{ mes_atual }}&ano={{ ano_atual }}" class="btn btn-sm btn-outline-secondary" target="_blank">
+                <i class="bi bi-file-earmark-pdf"></i> Gerar PDF
+            </a>
+        </form>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Servidor</th>
+                    {% if user.perfil.tipo == 'ADM' %}
+                    <th>Departamento</th>
+                    {% endif %}
+                    <th>Carga</th>
+                    <th class="text-center">Horas acumuladas</th>
+                    <th class="text-end">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in servidores_data %}
+                <tr>
+                    <td><strong>{{ item.servidor.nome_completo }}</strong></td>
+                    {% if user.perfil.tipo == 'ADM' %}
+                    <td><span class="badge bg-light text-dark border">{{ item.servidor.departamento.sigla }}</span></td>
+                    {% endif %}
+                    <td>{{ item.servidor.carga_horaria_diaria }}h</td>
+                    <td class="text-center">
+                        <span class="{% if item.saldo_raw > 0 %}saldo-positivo{% elif item.saldo_raw < 0 %}saldo-negativo{% else %}text-muted{% endif %} px-2 py-1 rounded">
+                            {{ item.saldo_formatado }}
+                        </span>
+                    </td>
+                    <td class="text-end">
+                        <a href="{% url 'relatorio_servidor' item.servidor.pk %}?mes={{ mes_atual }}&ano={{ ano_atual }}" class="btn btn-sm btn-outline-primary">Ver Detalhes</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

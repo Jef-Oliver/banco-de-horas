@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+{% load ponto_tags %}
+
+{% block content %}
+<div class="mb-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'relatorio_geral' %}">Relatórios</a></li>
+            <li class="breadcrumb-item active">{{ servidor.nome_completo }}</li>
+        </ol>
+    </nav>
+    <div class="d-flex justify-content-between align-items-end">
+        <div>
+            <h1>Extrato Individual</h1>
+            <p class="text-muted mb-0">{{ servidor.nome_completo }} | Carga: {{ servidor.carga_horaria_diaria }}h</p>
+        </div>
+        <div class="text-end">
+            <form method="get" class="d-flex gap-2 align-items-center bg-light p-2 rounded mb-2">
+                <select name="mes" class="form-select form-select-sm">
+                    {% for m in meses %}
+                    <option value="{{ m }}" {% if m == mes_atual %}selected{% endif %}>Mês {{ m }}</option>
+                    {% endfor %}
+                </select>
+                <select name="ano" class="form-select form-select-sm">
+                    {% for a in anos %}
+                    <option value="{{ a }}" {% if a == ano_atual %}selected{% endif %}>{{ a }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn btn-sm btn-primary">Ok</button>
+                <a href="{% url 'relatorio_servidor_pdf' servidor.pk %}?mes={{ mes_atual }}&ano={{ ano_atual }}" class="btn btn-sm btn-outline-secondary" target="_blank">
+                    <i class="bi bi-file-earmark-pdf"></i> Gerar PDF
+                </a>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm p-3 bg-light">
+            <small class="text-muted d-block mb-1">Saldo do Mês (Extras - Folgas)</small>
+            <h2 class="{% if '-' in saldo_mes_formatado %}text-secondary{% else %}text-primary{% endif %}">{{ saldo_mes_formatado }}</h2>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm p-3 bg-dark text-white">
+            <small class="text-muted d-block mb-1">Saldo Geral Acumulado</small>
+            <h2 class="text-white">{{ saldo_geral_formatado }}</h2>
+        </div>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-header bg-white border-bottom py-3">
+        <h5 class="mb-0">Registros de horas acumuladas do mês do relatório</h5>
+    </div>
+    <div class="table-responsive">
+        <table class="table mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Data</th>
+                    <th>Entrada</th>
+                    <th>Saída</th>
+                    <th>Trabalhadas</th>
+                    <th class="text-end">Saldo Extra</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in extrato %}
+                <tr>
+                    <td>{{ r.data|date:"d/m/Y" }}</td>
+                    <td>{{ r.entrada|time:"H:i" }}</td>
+                    <td>{{ r.saida|time:"H:i" }}</td>
+                    <td>
+                        {{ r.trabalhadas }}
+                        {% if r.saldo_raw == 0 %}
+                            {% with carga_min=servidor.carga_horaria_diaria|multiply:60 %}
+                            {% if r.trabalhadas_raw < carga_min %}
+                                <i class="bi bi-exclamação-triangle-fill text-warning ms-1" title="Carga horária incompleta"></i>
+                            {% endif %}
+                            {% endwith %}
+                        {% endif %}
+                    </td>
+                    <td class="text-end">
+                        <span class="{% if r.saldo_raw > 0 %}saldo-positivo{% else %}text-muted{% endif %}">
+                            {{ r.saldo_dia }}
+                        </span>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center py-4 text-muted">Nenhum registro de ponto encontrado.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 text-secondary">Folgas / Compensações do Mês</h5>
+        <a href="{% url 'compensacao_add' %}?servidor={{ servidor.pk }}" class="btn btn-sm btn-outline-secondary">Registrar Folga</a>
+    </div>
+    <div class="table-responsive">
+        <table class="table mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Data</th>
+                    <th>Descrição</th>
+                    <th class="text-center">Status</th>
+                    <th class="text-end">Desconto</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in compensacoes %}
+                <tr>
+                    <td>{{ c.data|date:"d/m/Y" }}</td>
+                    <td>{{ c.descricao|default:"Compensação de horas" }}</td>
+                    <td class="text-center">
+                        {% if c.status == 'PENDENTE' %}
+                            <span class="badge bg-warning text-dark">Pendente</span>
+                        {% elif c.status == 'APROVADO' %}
+                            <span class="badge bg-success">Aprovado</span>
+                        {% else %}
+                            <span class="badge bg-danger">Rejeitado</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-end text-danger">
+                        {% if c.status == 'APROVADO' %}
+                            -{{ c.minutos_descontados|format_minutos }}
+                        {% else %}
+                            <span class="text-muted">--:--</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" class="text-center py-4 text-muted">Nenhuma folga registrada este mês.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

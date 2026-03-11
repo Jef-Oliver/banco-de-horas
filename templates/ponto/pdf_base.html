@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        @page {
+            size: a4 portrait;
+            @frame header_frame {
+                -pdf-frame-content: header_content;
+                left: 30pt; width: 535pt; top: 30pt; height: 60pt;
+            }
+            @frame content_frame {
+                left: 30pt; width: 535pt; top: 100pt; height: 682pt;
+            }
+            @frame footer_frame {
+                -pdf-frame-content: footer_content;
+                left: 30pt; width: 535pt; top: 782pt; height: 30pt;
+            }
+        }
+        body {
+            font-family: Helvetica, Arial, sans-serif;
+            font-size: 10pt;
+            color: #333;
+        }
+        .text-center { text-align: center; }
+        .text-end { text-align: right; }
+        .text-primary { color: #0056b3; }
+        .text-muted { color: #6c757d; }
+        .mb-0 { margin-bottom: 0; }
+        .mt-4 { margin-top: 20pt; }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15pt;
+        }
+        th {
+            background-color: #f8f9fa;
+            border-bottom: 1pt solid #dee2e6;
+            padding: 8pt 5pt;
+            text-align: left;
+            font-weight: bold;
+        }
+        td {
+            border-bottom: 0.5pt solid #eee;
+            padding: 6pt 5pt;
+        }
+        .table-light th { background-color: #f1f3f5; }
+        
+        .saldo-positivo { color: #007bff; font-weight: bold; }
+        .saldo-negativo { color: #dc3545; font-weight: bold; }
+        
+        .badge {
+            padding: 3pt 6pt;
+            border-radius: 4pt;
+            font-size: 8pt;
+            background-color: #e9ecef;
+        }
+        .header-title {
+            font-size: 18pt;
+            font-weight: bold;
+            color: #004085;
+            margin-bottom: 2pt;
+        }
+    </style>
+</head>
+<body>
+    <div id="header_content">
+        <div class="text-center">
+            <div class="header-title">Banco de Horas</div>
+            <div class="text-muted">Relatório do Banco de Horas</div>
+        </div>
+    </div>
+
+    <div id="footer_content" class="text-center text-muted" style="font-size: 8pt;">
+        Gerado em {{ now|date:"d/m/Y H:i" }} - Página <pdf:pagenumber> de <pdf:pagecount>
+    </div>
+
+    <div class="content">
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>

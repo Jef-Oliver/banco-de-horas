@@ -1,0 +1,4 @@
+django>=5.0
+django-bootstrap5
+django-localflavor
+xhtml2pdf

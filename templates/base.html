@@ -1,0 +1,102 @@
+{% load static %}
+{% load django_bootstrap5 %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Banco de Horas{% endblock %}</title>
+    {% bootstrap_css %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">Banco de Horas</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    {% if user.is_authenticated and user.perfil %}
+                        {% if user.perfil.tipo == 'ADM' or user.perfil.tipo == 'GESTOR' %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'home' %}">Início</a>
+                            </li>
+                            {% if user.perfil.tipo == 'ADM' %}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'departamento_list' %}">Setores</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'gestor_list' %}">Gestores</a>
+                                </li>
+                            {% endif %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'servidor_list' %}">Servidores</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'ponto_add' %}">Lançar Ponto</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'compensacao_add' %}">Lançar Folga</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'compensacoes_pendentes' %}">Solicitações</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'relatorio_geral' %}">Relatório Geral</a>
+                            </li>
+                        {% elif user.perfil.tipo == 'SERVIDOR' %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'relatorio_servidor' user.servidor_perfil.pk %}">Meu Extrato</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'compensacao_add' %}">Solicitar Folga</a>
+                            </li>
+                        {% endif %}
+                    {% endif %}
+                </ul>
+                <ul class="navbar-nav">
+                    {% if user.is_authenticated %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle fw-bold text-white" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                                {{ user.username }} ({{ user.perfil.get_tipo_display }})
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <form method="post" action="{% url 'logout' %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="dropdown-item">Sair</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container container-main">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% block content %}{% endblock %}
+
+        <div class="text-center mt-5 mb-4 opacity-50">
+            <small><i></i>&copy; 2026 Secretaria da Administração</i></small>
+        </div>
+    </div>
+
+    {% bootstrap_javascript %}
+</body>
+</html>

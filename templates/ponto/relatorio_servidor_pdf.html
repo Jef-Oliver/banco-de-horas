@@ -1,0 +1,93 @@
+{% extends 'ponto/pdf_base.html' %}
+{% load ponto_tags %}
+
+{% block content %}
+<div class="text-center" style="margin-bottom: 15pt;">
+    <h2 class="mb-0">Extrato Individual de Banco de Horas</h2>
+    <div class="text-muted">Servidor: <strong>{{ servidor.nome_completo }}</strong> | Carga: {{ servidor.carga_horaria_diaria }}h</div>
+    <div class="text-muted">Mês de Referência: {{ mes_atual }}/{{ ano_atual }}</div>
+</div>
+
+<div style="margin-bottom: 20pt; border: 0.5pt solid #ddd; padding: 10pt; border-radius: 5pt; background-color: #fcfcfc;">
+    <table style="border: none; margin-bottom: 0;">
+        <tr>
+            <td style="border: none;">Saldo do Mês (Extras - Folgas)</td>
+            <td style="border: none;" class="text-end"><strong>{{ saldo_mes_formatado }}</strong></td>
+        </tr>
+        <tr>
+            <td style="border: none;">Saldo Geral Acumulado</td>
+            <td style="border: none;" class="text-end text-primary"><strong>{{ saldo_geral_formatado }}</strong></td>
+        </tr>
+    </table>
+</div>
+
+<h4 class="text-primary mb-0">Registros de horas acumuladas do mês do relatório</h4>
+<table>
+    <thead>
+        <tr>
+            <th>Data</th>
+            <th>Entrada</th>
+            <th>Saída</th>
+            <th>Horas Trabalhadas</th>
+            <th class="text-end">Saldo Extra</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for r in extrato %}
+        <tr>
+            <td>{{ r.data|date:"d/m/Y" }}</td>
+            <td class="text-center">{{ r.entrada|time:"H:i" }}</td>
+            <td class="text-center">{{ r.saida|time:"H:i" }}</td>
+            <td class="text-center">{{ r.trabalhadas }}</td>
+            <td class="text-end">
+                <span class="{% if r.saldo_raw > 0 %}saldo-positivo{% endif %}">
+                    {{ r.saldo_dia }}
+                </span>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="5" class="text-center py-4 text-muted">Nenhum registro de ponto.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% if compensacoes %}
+<h4 class="text-primary mb-0">Folgas / Compensações</h4>
+<table>
+    <thead>
+        <tr>
+            <th>Data</th>
+            <th>Descrição</th>
+            <th class="text-end">Desconto</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for c in compensacoes %}
+        <tr>
+            <td>{{ c.data|date:"d/m/Y" }}</td>
+            <td>{{ c.descricao|default:"Folga/Compensação" }}</td>
+            <td class="text-end" style="color: #dc3545;">-{{ c.minutos_descontados|format_minutos }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+
+<div style="margin-top: 80pt;">
+    <table style="border: none; margin-bottom: 0; width: 535pt;">
+        <tr>
+            <td style="border: none; width: 80pt;"></td>
+            <td style="border-top: 0.5pt solid #000; text-align: center; font-size: 8pt; width: 150pt; padding-top: 5pt;">
+                Assinatura do Servidor
+            </td>
+            <td style="border: none; width: 75pt;"></td>
+            <td style="border-top: 0.5pt solid #000; text-align: center; font-size: 8pt; width: 150pt; padding-top: 5pt;">
+                Assinatura do Chefe Imediato
+            </td>
+            <td style="border: none; width: 80pt;"></td>
+        </tr>
+    </table>
+</div>
+{% endblock %}
